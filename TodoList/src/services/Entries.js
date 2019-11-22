@@ -1,16 +1,27 @@
 import {getRealm} from './Realm';
-import Alert from   'react-native';
 
-export const saveTodo = async ()=>{
+
+export const getTodo =  async ()=>{
+    const realm = await getRealm();
+
+    const entries = realm.objects('Todo');
+
+    console.log('getTodo :: entries', entries);
+
+    return entries;
+};
+
+export const saveTodo = async value =>{
 
     const realm = await getRealm();
-    let data={};
+   let data={}
+   const{task}=value;
 
     try {
         realm.write(()=>{
             data = {
-               id:123,
-               name:'samurai',
+               id:'ABC',
+               name:task,
                done:false,
            };
    
@@ -20,7 +31,6 @@ export const saveTodo = async ()=>{
        console.log(data);
    
     } catch (error) {
-        Alert.alert('Erro ao salvar os dados...');
         console.error('saveTodo:: error on save object'+ JSON.stringify(this.data));
     }
   

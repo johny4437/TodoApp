@@ -1,82 +1,51 @@
-import React,{useState}from 'react'
-import { View, Text, StyleSheet, TextInput,TouchableOpacity, FlatList} from 'react-native'
+import React,{useEffect, useState} from 'react'
+import { View, Text, StyleSheet, Button, FlatList } from 'react-native';
 
-import {saveTodo} from '../services/Entries';
+import {getTodo} from '../services/Entries';
 
-const Todo = () => {
-    const [task, updateTask] = useState('');
-    const [todos, updateTodos] = useState([]);
-    const show = ()=>{
-        updateTodos([...todos, task]);
-        updateTask('');
-        
-    };
+const Todo = ({navigation}) => {
+    const [entries, setEntries]= useState([]);
 
+    useEffect(()=>{
 
-    const save = () =>{
-        saveTodo();
-    };
-const handelRenderTask =({item}) =><Text>{item}</Text>;
+        async function loadTodo(){
+            const data = await getTodo();
+            setEntries(data);
+        }
+        loadTodo();
+        console.log('Todo:: entries', JSON.stringify(entries));
+    },[]);
     return (
-        <View style={styles.container}>
-        <View style={styles.header}>
-            <Text style={styles.label}>Task App</Text>
+        <View>
+            <Text style={styles.container}>TodoApp</Text>
             <FlatList
-                data={todos}
-                keyExtractor={item => item}
-                renderItem={handelRenderTask}
-            >
+            data={entries}
+    renderItem={({item})=>(
+            <View>
+                <Text>{item.name}</Text>
+                <Button title ='item' 
+                onPress={()=>{
+                    navigation.navigate('NewEntry', {entry:item})
+                }}/>
+            </View>
+            )}
+            />
 
-            </FlatList>
-        </View>
-        <View style={styles.footer}>
-            <TouchableOpacity onPress={save} style={styles.button}>
-                <Text>+</Text>
-            </TouchableOpacity>
-            <TextInput onChangeText={text =>updateTask(text) } value={task} style={styles.textInput}></TextInput>
-        </View>
-
+            
+            <Button title="Adicionar" onPress={()=> navigation.navigate('NewEntry')}></Button>
         </View>
     )
 }
+
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        
-    },
-
-    header:{
-        alignItems:'center',
+        padding:20,
     },
     label:{
-        alignItems:'center',
-        fontSize:20,
+        fontSize:22,
         fontWeight:'bold',
-
-    },
-    footer:{
-        position:'absolute',
-        bottom:0,
-        left:0,
-        right:0,
-        zIndex:10,
-        borderTopColor:'#2c3e50'
-
-    },
-
-    textInput:{
-        backgroundColor:'#2c3e50',
-    },
-    button:{
-        bottom:0,
-        height:90,
-        width:90,
-        alignItems:'center',
-        padding:35,
-        borderRadius:90,
-        left:170,
-        backgroundColor:'#8e44ad'
-
     }
-})
-export default Todo
+});
+
+export default Todo;
